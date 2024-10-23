@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=agency_db
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+  containerone:
+    build:
+      context: ./containerone
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+    ports:
+      - '8000:8000'
+  containertwo:
+    build:
+      context: ./containertwo
+    command: sh -c "python manage.py runserver 0.0.0.0:8001"
+    ports:
+      - '8001:8001' 
+
+volumes:
+  db:
+    driver: local
